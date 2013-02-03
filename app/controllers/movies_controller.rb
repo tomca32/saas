@@ -10,7 +10,11 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.ratings
     @sorting = params[:sort]
     if params[:ratings]
-        @filtered_ratings = params[:ratings].keys
+        @unfiltered = params[:ratings]
+        @filtered_ratings = @unfiltered.keys
+    end
+    if params[:filtered_ratings]
+                @filtered_ratings = params[:filtered_ratings]
     end
     if @sorting == 'title'
         @title_highlight = 'hilite'
@@ -18,6 +22,7 @@ class MoviesController < ApplicationController
     if @sorting == 'release_date'
         @date_highlight = 'hilite'
     end
+    @filtered_ratings = @all_ratings unless @unfiltered
     @movies = Movie.find(:all, conditions: ["rating IN (?)", @filtered_ratings],:order => (params[:sort]))
   end
 
