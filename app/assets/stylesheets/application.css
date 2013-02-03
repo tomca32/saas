@@ -63,3 +63,7 @@ form label {
 table#movies th.hilite {
   background-color: yellow;
 }
+
+input#sort {
+    visibility:hidden;
+}
