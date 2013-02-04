@@ -7,7 +7,6 @@ class MoviesController < ApplicationController
   end
 
   def index
-    debugger
     @all_ratings = Movie.ratings
     @sesija = false
     
@@ -46,7 +45,6 @@ class MoviesController < ApplicationController
         session[:unfiltered_ratings] = @unfiltered
         session[:sort] = @sorting
     end
-    debugger
     @movies = Movie.find(:all, conditions: ["rating IN (?)", @filtered_ratings],:order => @sorting)
   end
 
