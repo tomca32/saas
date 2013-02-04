@@ -26,10 +26,11 @@ class MoviesController < ApplicationController
     if @sesija
         flash.keep    
         reset_session
-        redirect_to movies_path(:sort => @sorting, :ratings => @unfiltered)
+        
     end
-
-    @filtered_ratings = @unfiltered.keys
+    if @unfiltered
+        @filtered_ratings = @unfiltered.keys
+    end    
     @filtered_ratings = @all_ratings unless @unfiltered
     if params[:filtered_ratings]
         @filtered_ratings = params[:filtered_ratings]
@@ -41,11 +42,14 @@ class MoviesController < ApplicationController
     if @sorting == 'release_date'
         @date_highlight = 'hilite'
     end
-    unless @sesija
+    if @sesija
+        redirect_to movies_path(:sort => @sorting, :ratings => @unfiltered)
+    else
         session[:unfiltered_ratings] = @unfiltered
         session[:sort] = @sorting
+        @movies = Movie.find(:all, conditions: ["rating IN (?)", @filtered_ratings],:order => @sorting)
     end
-    @movies = Movie.find(:all, conditions: ["rating IN (?)", @filtered_ratings],:order => @sorting)
+    
   end
 
   def new
