@@ -7,24 +7,47 @@ class MoviesController < ApplicationController
   end
 
   def index
+    debugger
     @all_ratings = Movie.ratings
-    @sorting = params[:sort]
-    if params[:ratings]
+    @sesija = false
+    
+    if params.has_key?(:sort) && params[:sort]!=""
+        @sorting = params[:sort]
+    elsif (session.has_key?(:sort) && session[:sort] != "" && session[:sort]!= nil)
+        @sorting = session[:sort]
+        @sesija = true    
+    end   
+    if params.has_key?(:ratings)
         @unfiltered = params[:ratings]
-        @filtered_ratings = @unfiltered.keys
+    elsif session.has_key?(:unfiltered_ratings)
+        @unfiltered = session[:unfiltered_ratings]
+        @sesija = true
+    
     end
+    if @sesija
+        flash.keep    
+        reset_session
+        redirect_to movies_path(:sort => @sorting, :ratings => @unfiltered)
+    end
+
+    @filtered_ratings = @unfiltered.keys
     @filtered_ratings = @all_ratings unless @unfiltered
     if params[:filtered_ratings]
         @filtered_ratings = params[:filtered_ratings]
     end
+    
     if @sorting == 'title'
         @title_highlight = 'hilite'
     end
     if @sorting == 'release_date'
         @date_highlight = 'hilite'
     end
-    
-    @movies = Movie.find(:all, conditions: ["rating IN (?)", @filtered_ratings],:order => (params[:sort]))
+    unless @sesija
+        session[:unfiltered_ratings] = @unfiltered
+        session[:sort] = @sorting
+    end
+    debugger
+    @movies = Movie.find(:all, conditions: ["rating IN (?)", @filtered_ratings],:order => @sorting)
   end
 
   def new
